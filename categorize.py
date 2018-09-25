@@ -7,7 +7,7 @@ HOME_INCOME = 15
 
 def usage():
     print ("Categorize the dataset")
-    print ("python3 categorize.py <production input file> <attraction input file> <independent variables file>")
+    print ("python3 categorize.py <independent variables file>")
     exit(1)
 
 def analysis(result, f, hf, p):
@@ -71,7 +71,6 @@ def categorize(pf, af, hf, of):
 
 def output_result(result, of):
     s = "home_menno, car_yesno, home_income, num_of_household (p), productions, num_of_household (a), attractions, rate_of_productions, rate_of_attractions\n"
-    print (s)
     of.write(s)
     for i in range(1, 7):
         for j in range(1, 3):
@@ -91,7 +90,6 @@ def output_result(result, of):
                     ra = 0
 
                 s = "%d, %d, %d, %d, %d, %d, %d, %.02f, %.02f\n" % (i, j, k, plen, np, alen, na, rp, ra)
-                print (s)
                 of.write(s)
 
 def output_errors(d, p):
@@ -108,27 +106,27 @@ def output_errors(d, p):
     print ("# of household: %d, errors: %d\n" % (len(d.keys()), count))
 
 def main():
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 2:
         usage()
 
-    pfname = sys.argv[1]
-    afname = sys.argv[2]
-    hfname = sys.argv[3]
-
-    pf = open(pfname, "r")
-    af = open(afname, "r")
+    hfname = sys.argv[1]
     hf = open(hfname, "r")
 
-    est = int(pfname.split(".")[0].split("_")[-1])
-    val = 10 - est
-    ofname = "%d_%d_result.csv" % (est, val)
-    of = open(ofname, "w")
+    for i in range(5, 10):
+        j = 10 - i
+        pfname = "production_estimation_%d.txt" % i
+        afname = "attraction_estimation_%d.txt" % i
+        pf = open(pfname, "r")
+        af = open(afname, "r")
 
-    categorize(pf, af, hf, of)
-    pf.close()
-    af.close()
+        ofname = "%d_%d_result.csv" % (i, j)
+        of = open(ofname, "w")
+
+        categorize(pf, af, hf, of)
+        pf.close()
+        af.close()
+        of.close()
     hf.close()
-    of.close()
 
 if __name__ == "__main__":
     main()

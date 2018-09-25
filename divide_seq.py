@@ -7,6 +7,16 @@ def usage():
     print ("python3 divide.py <input dataset> <estimation ratio> <validation ratio>")
     exit(1)
 
+def total_lines(f):
+    count = 0
+    f.seek(0)
+    f.readline()
+
+    for line in f:
+        count += 1
+
+    return count
+
 def divide(f, e, v, ofe, ofv):
     s = "sheet_code\tsheet_type\tseq\ttr_seq\ttr_mokjek\ttr_sudan\tstart_type\tstart_zcode\tstart_time\tend_type\tend_zcode\tend_time\tperson\thighway\n"
     ofe.write(s)
@@ -14,10 +24,16 @@ def divide(f, e, v, ofe, ofv):
     est = 0
     val = 0
 
+    tot = total_lines(f)
+    eth = int(tot * float(e) / 10)
+    vth = tot - eth
+    f.seek(0)
     f.readline()
+
+    count = 0
     for line in f:
-        r = random.randint(1, 10)
-        if r > e:
+        count += 1
+        if count > eth:
             val += 1
             ofv.write(line)
         else:

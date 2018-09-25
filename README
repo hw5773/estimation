@@ -1,2 +1,32 @@
 Category Output
 home_menno, car_yesno, home_income, num_of_household (p), production, rate_of_production, num_of_household (a), attraction, rate_of_attraction
+
+1) Remove errors from home dataset
+ - ex) python3 remove_errors.py home.txt
+ - This outputs "home_revised.txt" and "home_errors.txt"
+ - home_revised.txt: home dataset without errors
+   home_errors.txt: the data with errors
+
+2) Remove errors and retrieve meaningful data
+ - ex) python3 sample.py generation.txt home_errors.txt
+   generation.txt: full dataset of trips
+   home_errors.txt: the data with errors
+ - This outputs "seoul_production.txt" and "seoul_attraction.txt"
+ - seoul_production.txt: a collection of outbound trips (toward outside)
+   seoul_attraction.txt: a collection of inbound trips (toward Seoul)
+
+3) Divide dataset into estimation ones and validation ones
+ - ex) python3 divide_seq.py seoul_production.txt 6 4
+   ex) python3 divide_seq.py seoul_attraction.txt 7 3
+ - The first one outputs "production_estimation_6.txt" and "production_validation_4.txt"
+   The second one outputs "attraction_estimation_7.txt" and "attraction_validation_3.txt"
+
+4) Generate the model from the estimation set based on the category analysis
+ - ex) python3 categorize.py production_estimation_7.txt attraction_estimation_7.txt home_revised.txt
+ - This outputs 7_3_result.csv
+ - The output file shows the production rate and the attraction rate with regard to categories
+
+5) Validate the model by the validation set
+ - ex) python3 validation.py home_revised.txt output.csv
+ - This outputs 5_5_validation.csv, 6_4_validation.csv, 7_3_validation.csv, 8_2_validation.csv, 9_1_validation.csv, and output.csv
+ - output.csv shows the mse with regard to productions and attractions
