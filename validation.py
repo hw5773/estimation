@@ -1,7 +1,7 @@
 import sys
 import math
-from matplotlib import pylab
-from pylab import title, xlabel, ylabel, legend, axis, plot, show, xticks, savefig
+import matplotlib.pyplot as plt
+import numpy as np
 
 SERIAL = 0
 HOME_MEMNO = 2
@@ -42,7 +42,7 @@ def frequency(result, f, hf, p):
             result[memno][int(htmp[CAR_YESNO])][int(htmp[HOME_INCOME])]["production"] += 1
 
 def validation(result, model, of):
-    s = "home_menno, car_yesno, home_income, num_of_household (p), estimation (p), productions, num_of_household (a), estimation (a), attraction\n"
+    s = "home_menno, car_yesno, home_income, num_of_household (p), rate for production, estimation (p), productions, num_of_household (a), rate for attraction, estimation (a), attraction\n"
     of.write(s)
     psum_error_squared = 0.0
     asum_error_squared = 0.0
@@ -51,14 +51,16 @@ def validation(result, model, of):
         for j in range(1, 3):
             for k in range(1, 7):
                 plen = len(result[i][j][k]["phousehold"])
-                ep = plen * model[i][j][k]["production"]
+                rp = model[i][j][k]["production"]
+                ep = plen * rp
                 np = result[i][j][k]["production"]
 
                 alen = len(result[i][j][k]["ahousehold"])
-                ea = alen * model[i][j][k]["attraction"]
+                ra = model[i][j][k]["attraction"]
+                ea = alen * ra
                 na = result[i][j][k]["attraction"]
 
-                s = "%d, %d, %d, %d, %.02f, %d, %d, %.02f, %d\n" % (i, j, k, plen, ep, np, alen, ea, na)
+                s = "%d, %d, %d, %d, %.02f, %.02f, %d, %d, %.02f, %.02f, %d\n" % (i, j, k, plen, rp, ep, np, alen, ra, ea, na)
                 of.write(s)
                 psum_error_squared += (ep - np) ** 2
                 asum_error_squared += (ea - na) ** 2
@@ -99,6 +101,37 @@ def analysis(pf, af, rf, hf, of):
     pmse, amse = validation(result, model, of)
     return pmse, amse
 
+def draw_graph(fname):
+    f = open(fname, "r")
+    f.readline()
+
+    x = []
+    p = []
+    a = []
+
+    for line in f:
+        tmp = line.strip().split(",")
+        label = "Estimation: %d\nValidation: %d" % (int(tmp[0]), int(tmp[1]))
+        x.append(label)
+        p.append(float(tmp[2]))
+        a.append(float(tmp[3]))
+
+    vals = [p, a]
+    n = len(vals)
+    xn = np.arange(len(x))
+    width = 0.8
+
+    for i in range(n):
+        plt.bar(xn - width/2. + i/float(n) * width, vals[i], width=width/float(n), align="edge")
+    plt.xticks(xn, x)
+    plt.xlabel("Estimation set to validation set")
+    plt.ylabel("Root-Mean-Squared-Error (RMSE)")
+    plt.legend(["Production", "Attraction"])
+    plt.show()
+    figname = "rmse.png"
+    plt.savefig(figname)
+    f.close()
+
 def main():
     if len(sys.argv) != 3:
         usage()
@@ -137,6 +170,7 @@ def main():
 
     hf.close()
     out.close()
+    draw_graph(out_name)
 
 if __name__ == "__main__":
     main()
