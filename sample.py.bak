@@ -1,0 +1,139 @@
+import sys
+
+START = 7
+END = 10
+
+def usage():
+    print ("python3 sample.py <input data>")
+    exit(1)
+
+def trip(ofs, ofname):
+    of = open(ofname, "w")
+    klst = sorted(ofs.keys())
+    s = "Gu, Count\n"
+    of.write(s)
+
+    for k in klst:
+        count = 0
+        for line in ofs[k]:
+            count = count + 1
+        l = "%s, %d\n" % (k, count)
+        of.write(l)
+
+    of.close()
+
+def dong_result(dp, da):
+    print ("Productions: ")
+    for k in dp.keys():
+        print ("%s, %d" % (k, dp[k]))
+    print("\n")
+    print ("Attractions: ")
+    for k in da.keys():
+        print ("%s, %d" % (k, da[k]))
+    print("\n")
+    print ("Production Max: %d, Min: %d" % (max(dp.values()), min(dp.values())))
+    print ("Attraction Max: %d, Min: %d" % (max(da.values()), min(da.values())))
+
+def sample(f, ofps, ofas):
+    f.readline().strip()
+    lines = 0
+    out = 0
+    same = 0
+    within_seoul = 0
+    from_seoul_to_out = 0
+    from_out_to_seoul = 0
+
+    dongp = {}
+    donga = {}
+
+    for line in f:
+        lines = lines + 1
+        tmp = line.strip().split("\t")
+        if tmp[START].split("-")[0] != "01" and tmp[END].split("-")[0] != "01":
+            out = out + 1
+            continue
+        if tmp[START][0:5] == tmp[END][0:5]:
+            same = same + 1
+            continue
+
+        if tmp[START] not in dongp.keys():
+            dongp[tmp[START]] = 1
+        else:
+            dongp[tmp[START]] += 1
+
+        if tmp[END] not in donga.keys():
+            donga[tmp[END]] = 1
+        else:
+            donga[tmp[END]] += 1
+
+        if tmp[START][0:2] == "01" and tmp[END][0:2] == "01":
+            within_seoul =  within_seoul + 1
+
+        if tmp[START][0:2] == "01" and tmp[END][0:2] != "01":
+            from_seoul_to_out = from_seoul_to_out + 1
+
+        if tmp[START][0:2] != "01" and tmp[END][0:2] == "01":
+            from_out_to_seoul = from_out_to_seoul + 1
+
+        if tmp[START][0:2] == "01":
+            start_gu = tmp[START][3:6]
+            ofps[start_gu].write(line)
+        if tmp[END][0:2] == "01":
+            end_gu = tmp[END][3:6]
+            ofas[end_gu].write(line)
+
+    print ("Total: ", lines, ", Out: ", out, ", Same: ", same, ", Rest: ", lines - out - same)
+    print ("Total: ", within_seoul + from_seoul_to_out + from_out_to_seoul, ", Within Seoul: ", within_seoul, ", From Seoul to Out: ", from_seoul_to_out, ", From out to Seoul: ", from_out_to_seoul)
+
+    dong_result(dongp, donga)
+
+def main():
+    if len(sys.argv) != 2:
+        usage()
+
+    # output files: 001.txt, 002.txt, ... 
+    ofps = {} # the collection of production files
+    ofas = {} # the collection attraction files
+
+    # initialize output files
+    for i in range(16):
+        ofstr = "%02d" % (i+1)
+        ofpname = "%s_production.txt" % (ofstr)
+        ofaname = "%s_attraction.txt" % (ofstr)
+        ofp = open(ofpname, "w")
+        ofa = open(ofaname, "w")
+        ofps[ofstr] = ofp
+        ofas[ofstr] = ofa
+
+    # open the input file
+    fname = sys.argv[1]
+    f = open(fname, "r")
+
+    sample(f, ofps, ofas)
+
+    # close the input file
+    f.close()
+
+    # open the gu files
+    gup = {}
+    gua = {}
+    for i in range(16):
+        fstr = "%02d" % (i+1)
+        fpname = "%s_production.txt" % (fstr)
+        faname = "%s_attraction.txt" % (fstr)
+        fp = open(fpname, "r")
+        fa = open(faname, "r")
+        gup[fstr] = fp
+        gua[fstr] = fa
+    
+    trip(gup, "production.txt")
+    trip(gua, "attraction.txt")
+
+    for k in gup.keys():
+        gup[k].close()
+
+    for k in gua.keys():
+        gua[k].close()
+
+if __name__ == "__main__":
+    main()
