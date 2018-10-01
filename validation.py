@@ -65,8 +65,8 @@ def validation(result, model, of):
                 psum_error_squared += (ep - np) ** 2
                 asum_error_squared += (ea - na) ** 2
 
-    pmse = math.sqrt(psum_error_squared)
-    amse = math.sqrt(asum_error_squared)
+    pmse = math.sqrt(psum_error_squared / 72.0)
+    amse = math.sqrt(asum_error_squared / 72.0)
 
     return pmse, amse
 
@@ -127,9 +127,9 @@ def draw_graph(fname):
     plt.xlabel("Estimation set to validation set")
     plt.ylabel("Root-Mean-Squared-Error (RMSE)")
     plt.legend(["Production", "Attraction"])
-    plt.show()
     figname = "rmse.png"
     plt.savefig(figname)
+    plt.show()
     f.close()
 
 def main():

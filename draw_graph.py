@@ -50,7 +50,7 @@ def draw_graph(f, ofname):
         ae.append(float(tmp[A_ESTIMATION]))
         aa.append(int(tmp[A_ANSWER]))
 
-    vals = [pe, pa, ae, aa]
+    vals = [ae, aa]
     n = len(vals)
     xn = np.arange(len(x))
     width = 0.8
@@ -60,11 +60,11 @@ def draw_graph(f, ofname):
     plt.xticks(xn, x)
     plt.xlabel("Category")
     plt.ylabel("Frequency")
-    plt.legend(["Model Outputs of Production", "Answers of Production", "Model Outputs of Attraction", "Answers of Attraction"])
-    #plt.legend(["Model Outputs of Attraction", "Answers of Attraction"])
+    #plt.legend(["Model Outputs of Production", "Answers of Production", "Model Outputs of Attraction", "Answers of Attraction"])
+    plt.legend(["Model Outputs of Attraction", "Answers of Attraction"])
 
-    plt.show()
     plt.savefig(ofname)
+    plt.show()
 
 def main():
     if len(sys.argv) != 2:
